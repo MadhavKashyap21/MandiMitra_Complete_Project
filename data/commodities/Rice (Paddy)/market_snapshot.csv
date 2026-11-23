@@ -1,0 +1,68 @@
+Unnamed: 0,State,cluster,cluster_name,recent_price,momentum_pct,volatility,lat,lon,coord_source
+Madhya Pradesh | Garoth APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2656.1,-0.89,3.6,24.32342,75.65204,derived-gazetteer
+Uttar Pradesh | Gonda APMC,Uttar Pradesh,2,High-Volume Value Mandis (Provisional),2469.2,-0.52,3.06,27.13181,81.95332,derived-gazetteer
+Madhya Pradesh | A lot APMC,Madhya Pradesh,0,Premium High-Return (Provisional),2948.9,-1.44,3.69,23.76336,75.55662,derived-gazetteer
+Uttar Pradesh | Dibiapur APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2650.8,-2.59,1.6,26.46517,79.50918,derived-gazetteer
+Madhya Pradesh | Khargapur APMC,Madhya Pradesh,0,Premium High-Return (Provisional),3128.3,3.12,2.26,24.823,79.144,derived-gazetteer
+Maharashtra | APMC Deoulgaon Raja,Maharashtra,0,Premium High-Return (Provisional),3065.3,2.93,1.5,,,derived-gazetteer
+Madhya Pradesh | Khilchipur APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2927.4,2.07,3.54,24.03943,76.578,derived-gazetteer
+Madhya Pradesh | Alirajpur APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2510.6,-2.94,2.61,22.30393,74.35568,derived-gazetteer
+Madhya Pradesh | Harsood APMC,Madhya Pradesh,0,Premium High-Return (Provisional),3001.4,3.52,2.18,21.82427,76.35086,derived-gazetteer
+Maharashtra | APMC Paithan,Maharashtra,1,Steady Regional Mandis (Provisional),2463.8,-4.51,2.34,19.47506,75.38558,derived-gazetteer
+Madhya Pradesh | Dhar APMC,Madhya Pradesh,0,Premium High-Return (Provisional),2829.1,-2.63,3.5,22.59373,75.29774,derived-gazetteer
+Uttar Pradesh | Naugarh APMC,Uttar Pradesh,2,High-Volume Value Mandis (Provisional),2614.1,-3.56,5.41,,,derived-gazetteer
+Gujarat | Modasa APMC,Gujarat,2,High-Volume Value Mandis (Provisional),2490.2,3.18,4.29,23.46253,73.29857,derived-gazetteer
+Madhya Pradesh | Timarni APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2861.3,-0.71,4.86,22.34414,77.09536,derived-gazetteer
+Uttar Pradesh | Bansi APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2602.2,-1.95,2.1,27.17749,82.93442,derived-gazetteer
+Madhya Pradesh | Gadakota APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2965.5,-5.58,3.42,23.83877,78.73874,derived-gazetteer
+Madhya Pradesh | Harda APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2695.7,-2.11,4.54,22.34414,77.09536,derived-gazetteer
+West Bengal | Bishnupur(Bankura) APMC,West Bengal,2,High-Volume Value Mandis (Provisional),2482.0,-3.07,5.84,23.0738,87.31991,derived-gazetteer
+Madhya Pradesh | Karhi APMC,Madhya Pradesh,0,Premium High-Return (Provisional),2978.4,5.64,3.46,21.82292,75.61394,derived-gazetteer
+Madhya Pradesh | Sevda APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2544.2,4.55,2.31,25.67312,78.45908,derived-gazetteer
+Madhya Pradesh | Sehora APMC,Madhya Pradesh,0,Premium High-Return (Provisional),2747.1,0.91,2.57,23.16697,79.95006,derived-gazetteer
+Uttarakhand | Lakshar APMC,Uttarakhand,1,Steady Regional Mandis (Provisional),2849.3,1.45,2.78,29.94791,78.16025,derived-gazetteer
+Uttar Pradesh | Powayan APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2895.0,-1.25,3.56,27.88165,79.90918,derived-gazetteer
+Uttar Pradesh | Shahjahanpur APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2681.5,0.19,3.65,27.88165,79.90918,derived-gazetteer
+Uttar Pradesh | Utraula APMC,Uttar Pradesh,0,Premium High-Return (Provisional),3026.5,0.02,3.4,27.31933,82.41872,derived-gazetteer
+Madhya Pradesh | Mandla APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2514.5,-4.09,2.97,22.59879,80.37115,derived-gazetteer
+Uttar Pradesh | Mehrauni APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2655.8,-0.41,3.22,24.69007,78.41915,derived-gazetteer
+Rajasthan | Kherli APMC,Rajasthan,1,Steady Regional Mandis (Provisional),2693.5,1.76,2.2,27.27359,76.98613,derived-gazetteer
+Madhya Pradesh | Sanwer APMC,Madhya Pradesh,0,Premium High-Return (Provisional),2730.2,0.3,2.44,22.97415,75.8271,derived-gazetteer
+Uttar Pradesh | Shahabad(New Mandi) APMC,Uttar Pradesh,0,Premium High-Return (Provisional),3083.5,-0.5,2.44,27.6431,79.9402,derived-gazetteer
+Maharashtra | APMC Kopargaon,Maharashtra,1,Steady Regional Mandis (Provisional),2757.7,0.63,3.26,19.88239,74.47605,derived-gazetteer
+Uttar Pradesh | Etah APMC,Uttar Pradesh,2,High-Volume Value Mandis (Provisional),2434.5,-4.1,3.73,27.55879,78.65692,derived-gazetteer
+Madhya Pradesh | Neemuch APMC,Madhya Pradesh,0,Premium High-Return (Provisional),3221.8,4.55,2.91,,,derived-gazetteer
+Uttar Pradesh | Raibareilly APMC,Uttar Pradesh,2,High-Volume Value Mandis (Provisional),2681.6,2.16,5.01,,,derived-gazetteer
+Madhya Pradesh | Ashta APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2699.8,-3.75,1.76,23.01754,76.72208,derived-gazetteer
+Uttar Pradesh | Nautnava APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2597.7,0.29,3.56,27.14456,83.56214,derived-gazetteer
+Madhya Pradesh | Lahar APMC,Madhya Pradesh,0,Premium High-Return (Provisional),3038.8,1.6,3.32,26.19401,78.94137,derived-gazetteer
+Uttar Pradesh | Shohratgarh APMC,Uttar Pradesh,2,High-Volume Value Mandis (Provisional),2781.9,-2.16,3.05,,,derived-gazetteer
+Madhya Pradesh | Sironj APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2613.2,-2.76,3.28,24.10313,77.69055,derived-gazetteer
+Uttar Pradesh | Jhijhank APMC,Uttar Pradesh,0,Premium High-Return (Provisional),2885.5,-0.87,1.21,,,derived-gazetteer
+Uttar Pradesh | Gorakhpur APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2932.4,-0.78,3.27,26.76628,83.36889,derived-gazetteer
+Uttar Pradesh | Lalitpur APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2507.7,-1.97,1.27,24.69007,78.41915,derived-gazetteer
+Rajasthan | Deoli APMC,Rajasthan,1,Steady Regional Mandis (Provisional),2612.2,-3.85,3.52,25.75728,75.37991,derived-gazetteer
+Madhya Pradesh | Amarpatan APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2687.5,-0.55,1.95,24.31371,80.97703,derived-gazetteer
+Madhya Pradesh | Khategaon APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2806.9,-0.15,1.29,22.59573,76.9133,derived-gazetteer
+Madhya Pradesh | Dewas APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2549.6,-2.94,4.83,22.96585,76.05526,derived-gazetteer
+Madhya Pradesh | Raisen APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2372.5,2.42,3.9,23.33033,77.7811,derived-gazetteer
+Madhya Pradesh | Narsinghpur APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2580.9,-2.87,4.66,22.94936,79.18357,derived-gazetteer
+Madhya Pradesh | Kasrawad APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2885.2,-5.66,3.66,22.12745,75.61101,derived-gazetteer
+Madhya Pradesh | Shamgarh APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2920.3,-0.73,2.27,24.18817,75.63903,derived-gazetteer
+Madhya Pradesh | Hanumana APMC,Madhya Pradesh,1,Steady Regional Mandis (Provisional),2507.6,4.74,2.78,24.77888,82.096,derived-gazetteer
+Gujarat | Kadi APMC,Gujarat,2,High-Volume Value Mandis (Provisional),2416.9,-5.01,4.13,23.29908,72.33362,derived-gazetteer
+Madhya Pradesh | Badnagar APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2709.3,0.18,4.75,23.18239,75.77643,derived-gazetteer
+Uttar Pradesh | Madhogarh APMC,Uttar Pradesh,0,Premium High-Return (Provisional),2802.3,0.28,2.0,26.27522,79.1859,derived-gazetteer
+Madhya Pradesh | Badarwas APMC,Madhya Pradesh,0,Premium High-Return (Provisional),3115.9,0.98,1.57,24.97516,77.5649,derived-gazetteer
+Gujarat | Viramgam APMC,Gujarat,1,Steady Regional Mandis (Provisional),2617.4,0.76,3.39,23.12564,72.05014,derived-gazetteer
+Madhya Pradesh | Rajnagar APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2409.5,-0.91,2.89,24.88929,79.91178,derived-gazetteer
+West Bengal | Karimpur APMC,West Bengal,1,Steady Regional Mandis (Provisional),2685.4,0.69,1.31,23.97594,88.61917,derived-gazetteer
+Uttar Pradesh | Aligarh APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2779.4,-0.78,3.73,27.88145,78.07464,derived-gazetteer
+Gujarat | Rajkot APMC,Gujarat,2,High-Volume Value Mandis (Provisional),2313.4,1.11,4.98,22.29161,70.79322,derived-gazetteer
+Uttar Pradesh | Paliakala APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2860.2,-3.97,1.28,27.94822,80.77935,derived-gazetteer
+Gujarat | Visavadar APMC,Gujarat,1,Steady Regional Mandis (Provisional),2986.3,1.27,1.58,21.33954,70.74966,derived-gazetteer
+Uttar Pradesh | Lakhimpur APMC,Uttar Pradesh,2,High-Volume Value Mandis (Provisional),2355.6,0.35,4.82,27.94822,80.77935,derived-gazetteer
+Uttar Pradesh | Pratapgarh APMC,Uttar Pradesh,1,Steady Regional Mandis (Provisional),2908.6,1.86,1.46,25.92058,81.99629,derived-gazetteer
+Madhya Pradesh | Damoh APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2748.6,1.39,3.74,23.83312,79.4419,derived-gazetteer
+Uttar Pradesh | Sahiyapur APMC,Uttar Pradesh,2,High-Volume Value Mandis (Provisional),2627.0,5.36,3.54,,,derived-gazetteer
+Madhya Pradesh | Silvani APMC,Madhya Pradesh,2,High-Volume Value Mandis (Provisional),2452.4,-2.0,4.8,23.3026,78.44076,derived-gazetteer

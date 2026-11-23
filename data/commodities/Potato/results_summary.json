@@ -1,0 +1,35 @@
+{
+  "data": "Authentic Agmarknet Profile for Potato",
+  "commodity": "Potato",
+  "n_rows_clean": 2376,
+  "n_markets_before_filter": 118,
+  "n_markets": 66,
+  "n_features": 11,
+  "chosen_distance": "manhattan",
+  "chosen_k": 3,
+  "silhouette": 0.231,
+  "davies_bouldin": 1.46,
+  "cost": 1820.5,
+  "runner_up": "manhattan K=4",
+  "cluster_sizes": {
+    "0": 17,
+    "1": 29,
+    "2": 20
+  },
+  "cluster_names": {
+    "0": "Premium High-Return (Provisional)",
+    "1": "Steady Regional Mandis (Provisional)",
+    "2": "High-Volume Value Mandis (Provisional)"
+  },
+  "ward_vs_kmeans_ARI": 0.38,
+  "cophenetic_corr": 0.41,
+  "stability_overall_ARI": 0.67,
+  "stability_verdict": "moderately stable",
+  "top3_features": [
+    "max_price",
+    "seasonal_amp",
+    "trend_slope"
+  ],
+  "pca_var_first2": 0.61,
+  "date_range": "Nov 2025 to Nov 2026"
+}
