@@ -513,8 +513,8 @@ if st.session_state["experience_mode"] == "farmer":
             with calc_c1:
                 st.markdown("#### Input Farm & Selling Details")
                 c_qty = st.number_input("Selling Quantity (Quintals)", min_value=1.0, value=farmer_qty, step=5.0, key="calc_q")
-                c_price = st.number_input(f"Expected Selling Price (₹/quintal)", min_value=500.0, value=float(decision_meta.get("best_net_price", 2500.0)), step=25.0)
-                c_dist = st.number_input("Transport Distance (km)", min_value=1.0, value=float(decision_meta.get("best_distance_km", 45.0)), step=5.0)
+                c_price = st.number_input("Expected Selling Price (₹/quintal)", min_value=0.0, value=max(float(decision_meta.get("best_net_price", 2500.0)), 0.0))
+                c_dist = st.number_input("Transport Distance (km)", min_value=0.0, value=max(float(decision_meta.get("best_distance_km", 45.0)), 0.0))
                 c_tr_rate = st.number_input("Transport Rate (₹/quintal-km)", min_value=0.01, value=transport_rate, step=0.02)
                 c_fee = st.number_input("Mandi Fee / Tax (%)", min_value=0.0, value=mandi_fee_pct, step=0.5)
                 c_handling = st.number_input("Labor / Loading Charges (₹/quintal)", min_value=0.0, value=15.0, step=2.0)
