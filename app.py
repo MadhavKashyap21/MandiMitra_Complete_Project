@@ -266,16 +266,19 @@ if st.session_state["experience_mode"] == "farmer":
             index=default_idx + 1 if market_list else 0,
         )
 
-        if selected_mandi_id == "Custom GPS Coordinates":
-            c_lat = st.number_input("Latitude", value=float(valid_coords["lat"].median()), format="%.4f")
-            c_lon = st.number_input("Longitude", value=float(valid_coords["lon"].median()), format="%.4f")
+        med_lat = float(valid_coords["lat"].median()) if (not valid_coords.empty and pd.notna(valid_coords["lat"].median())) else 22.7196
+        med_lon = float(valid_coords["lon"].median()) if (not valid_coords.empty and pd.notna(valid_coords["lon"].median())) else 75.8577
+
+        if selected_mandi_id == "Custom GPS Coordinates" or selected_mandi_id not in valid_coords.index:
+            c_lat = st.number_input("Latitude", value=med_lat, format="%.4f")
+            c_lon = st.number_input("Longitude", value=med_lon, format="%.4f")
         else:
-            c_lat = float(valid_coords.loc[selected_mandi_id, "lat"])
-            c_lon = float(valid_coords.loc[selected_mandi_id, "lon"])
+            c_lat = float(valid_coords.loc[selected_mandi_id, "lat"]) if pd.notna(valid_coords.loc[selected_mandi_id, "lat"]) else med_lat
+            c_lon = float(valid_coords.loc[selected_mandi_id, "lon"]) if pd.notna(valid_coords.loc[selected_mandi_id, "lon"]) else med_lon
 
         st.markdown("---")
         st.markdown(f"### ⚙️ {t('nav_advisor', lang)} Settings")
-        farmer_qty = st.number_input(t("quantity_q", lang), min_value=1.0, max_value=50000.0, value=50.0, step=5.0)
+        farmer_qty = st.number_input(t("quantity_q", lang), min_value=0.1, max_value=50000.0, value=50.0, step=5.0)
 
         # Vehicle Selection Feature
         st.markdown("#### 🚚 Transport Vehicle Mode")
@@ -291,7 +294,6 @@ if st.session_state["experience_mode"] == "farmer":
             transport_rate = st.slider(t("transport_rate", lang), min_value=0.05, max_value=1.0, value=0.20, step=0.02)
         else:
             v_info = VEHICLE_PROFILES[vehicle_choice]
-            # Convert vehicle rate per km into approx per quintal-km at full capacity
             transport_rate = round(v_info["rate_per_km"] / v_info["capacity"], 3)
             st.caption(f"{v_info['desc']} (~₹{transport_rate:.2f}/quintal-km at {v_info['capacity']:.0f}q cap)")
 
@@ -495,7 +497,7 @@ if st.session_state["experience_mode"] == "farmer":
         )
 
     # -------------------------------------------------------------------------
-    # TAB 4: ADVANCED PROFIT, FREIGHT & QUALITY CALCULATOR (NEW FEATURES)
+    # TAB 4: ADVANCED PROFIT, FREIGHT & QUALITY CALCULATOR
     # -------------------------------------------------------------------------
     with f_tabs["nav_calculator"]:
         st.markdown(f"## 🧮 Comprehensive Farmer Profit & Freight Intelligence")
@@ -512,11 +514,11 @@ if st.session_state["experience_mode"] == "farmer":
             calc_c1, calc_c2 = st.columns([1.1, 1.2])
             with calc_c1:
                 st.markdown("#### Input Farm & Selling Details")
-                c_qty = st.number_input("Selling Quantity (Quintals)", min_value=1.0, value=farmer_qty, step=5.0, key="calc_q")
-                c_price = st.number_input("Expected Selling Price (₹/quintal)", min_value=0.0, value=max(float(decision_meta.get("best_net_price", 2500.0)), 0.0))
-                c_dist = st.number_input("Transport Distance (km)", min_value=0.0, value=max(float(decision_meta.get("best_distance_km", 45.0)), 0.0))
-                c_tr_rate = st.number_input("Transport Rate (₹/quintal-km)", min_value=0.01, value=transport_rate, step=0.02)
-                c_fee = st.number_input("Mandi Fee / Tax (%)", min_value=0.0, value=mandi_fee_pct, step=0.5)
+                c_qty = st.number_input("Selling Quantity (Quintals)", min_value=0.1, value=max(float(farmer_qty), 0.1), step=5.0, key="calc_q")
+                c_price = st.number_input(f"Expected Selling Price (₹/quintal)", min_value=0.0, value=max(float(decision_meta.get("best_net_price", 2500.0)), 0.0), step=25.0)
+                c_dist = st.number_input("Transport Distance (km)", min_value=0.0, value=max(float(decision_meta.get("best_distance_km", 45.0)), 0.0), step=5.0)
+                c_tr_rate = st.number_input("Transport Rate (₹/quintal-km)", min_value=0.0, value=max(float(transport_rate), 0.0), step=0.02)
+                c_fee = st.number_input("Mandi Fee / Tax (%)", min_value=0.0, value=max(float(mandi_fee_pct), 0.0), step=0.5)
                 c_handling = st.number_input("Labor / Loading Charges (₹/quintal)", min_value=0.0, value=15.0, step=2.0)
                 c_cult_cost = st.number_input("Your Cultivation Cost (₹/quintal)", min_value=0.0, value=1550.0, step=50.0)
 
@@ -561,8 +563,8 @@ if st.session_state["experience_mode"] == "farmer":
             vf_col1, vf_col2 = st.columns(2)
             with vf_col1:
                 v_type_calc = st.selectbox("Choose Transport Mode", list(VEHICLE_PROFILES.keys()), format_func=lambda k: VEHICLE_PROFILES[k]["name"], key="v_calc_select")
-                v_dist = st.number_input("One-Way Road Distance (km)", min_value=1.0, value=float(decision_meta.get("best_distance_km", 45.0)), step=5.0, key="v_dist_input")
-                v_load = st.number_input("Produce Payload to Move (Quintals)", min_value=1.0, value=farmer_qty, step=5.0, key="v_load_input")
+                v_dist = st.number_input("One-Way Road Distance (km)", min_value=0.0, value=max(float(decision_meta.get("best_distance_km", 45.0)), 0.0), step=5.0, key="v_dist_input")
+                v_load = st.number_input("Produce Payload to Move (Quintals)", min_value=0.1, value=max(float(farmer_qty), 0.1), step=5.0, key="v_load_input")
 
             v_freight = calculate_vehicle_freight(v_type_calc, v_dist, v_load)
 
@@ -588,7 +590,7 @@ if st.session_state["experience_mode"] == "farmer":
             m_col1, m_col2 = st.columns(2)
             with m_col1:
                 input_moisture = st.slider("Measured Grain Moisture (%)", min_value=10.0, max_value=20.0, value=14.0, step=0.5)
-                m_price = st.number_input("Mandi Base Price (₹/quintal)", min_value=500.0, value=float(decision_meta.get("best_net_price", 2500.0)), step=25.0, key="m_price_in")
+                m_price = st.number_input("Mandi Base Price (₹/quintal)", min_value=0.0, value=max(float(decision_meta.get("best_net_price", 2500.0)), 0.0), step=25.0, key="m_price_in")
 
             m_ded = calculate_moisture_deduction(m_price, input_moisture, farmer_qty)
 
@@ -614,7 +616,7 @@ if st.session_state["experience_mode"] == "farmer":
             p_col1, p_col2 = st.columns(2)
             with p_col1:
                 n_members = st.slider("Number of Pooling Farmers", min_value=2, max_value=15, value=4)
-                pool_dist = st.number_input("Road Distance to Distant High-Paying Mandi (km)", min_value=10.0, value=120.0, step=10.0)
+                pool_dist = st.number_input("Road Distance to Distant High-Paying Mandi (km)", min_value=0.0, value=120.0, step=10.0)
 
             pool_res = calculate_fpo_pooling_savings(farmer_qty, n_members, pool_dist)
 
@@ -639,7 +641,7 @@ if st.session_state["experience_mode"] == "farmer":
 
         be_col1, be_col2 = st.columns([1.2, 1])
         with be_col1:
-            test_dist = st.number_input("Distance to Distant Mandi (km)", min_value=5.0, value=80.0, step=5.0, key="be_dist")
+            test_dist = st.number_input("Distance to Distant Mandi (km)", min_value=0.0, value=80.0, step=5.0, key="be_dist")
             be_price = calculate_breakeven_price(float(decision_meta.get("nearest_net_price", 2450.0)), test_dist, transport_rate, mandi_fee_pct)
         with be_col2:
             st.markdown(f"""
@@ -659,16 +661,15 @@ if st.session_state["experience_mode"] == "farmer":
         st.markdown(f"## 🗺️ Nearby Mandi Finder & Multi-Market Comparison")
         st.caption("Interactive geospatial view of reachable mandis with color-coded profit marks. Click any market on the map, use the quick-pick buttons, or select below to inspect exact profit gains.")
 
-        # Educational Expander: What happens when you change the market
         with st.expander("ℹ️ What happens when you change your origin market?", expanded=False):
             st.markdown(f"""
 <div style="background:#F2ECE3; border-radius:14px; padding:16px 20px; font-size:0.92rem; color:#2F3B52; line-height:1.6;">
   <b style="font-size:1.05rem; color:#1E5128;">🔄 Dynamic Impacts of Changing Your Market Location:</b>
   <ol style="margin-top:8px; padding-left:20px;">
-    <li><b>GPS Coordinates Shift:</b> The center point of the radius scan moves to your newly chosen origin market (marked with the ⭐ <b>Amber Star</b>).</li>
+    <li><b>GPS Coordinates Shift:</b> Center point moves to your chosen origin market (marked with the ⭐ <b>Amber Star</b>).</li>
     <li><b>Hauling Distances Recalculated:</b> Road distances (km) to all {len(snap_df)} APMC mandis are dynamically computed from your new location.</li>
-    <li><b>Transport Deductions Updated:</b> Because distance changes, fuel and freight costs (₹/quintal) are recalculated for every single destination.</li>
-    <li><b>Net Realization & Rankings Shift:</b> A distant mandi that was profitable from Indore may be too far from Jaipur or Nashik. The <b>#1 Best Mandi</b>, 🟢 <b>Green Marks (Top 3)</b>, and 🔵 <b>Blue Marks (Top 4–10)</b> automatically reorganize to maximize your in-pocket profit from your specific location.</li>
+    <li><b>Transport Deductions Updated:</b> Fuel and freight costs (₹/quintal) recalculate for every single destination.</li>
+    <li><b>Net Realization & Rankings Shift:</b> The <b>#1 Best Mandi</b>, 🟢 <b>Green Marks (Top 3)</b>, and 🔵 <b>Blue Marks (Top 4–10)</b> automatically reorganize to maximize your in-pocket profit from your specific location.</li>
     <li><b>Local Benchmark Re-anchored:</b> The baseline local rate updates to your new origin's trading rate, so your <i>"Extra Cash Profit vs Local Mandi"</i> always shows genuine arbitrage over selling at home.</li>
   </ol>
 </div>
@@ -678,10 +679,8 @@ if st.session_state["experience_mode"] == "farmer":
         if not map_mandis.empty:
             def get_mandi_visuals(rank):
                 if rank <= 3:
-                    # Vivid Radiant Green
                     return [34, 197, 94, 255], 22000, "🟢 Green Mark: Top 3 Maximum Profit", "🟢 Green"
                 elif rank <= 10:
-                    # Vivid Royal Blue
                     return [37, 99, 235, 255], 16000, "🔵 Blue Mark: Top 4–10 High Return", "🔵 Blue"
                 else:
                     return [148, 163, 184, 180], 9000, "⚪ Grey Mark: Other Reachable Mandi", "⚪ Grey"
@@ -765,7 +764,7 @@ if st.session_state["experience_mode"] == "farmer":
                 },
                 map_style="light",
             )
-            
+
             map_chart_event = st.pydeck_chart(
                 deck,
                 on_select="rerun",
@@ -838,7 +837,6 @@ if st.session_state["experience_mode"] == "farmer":
         if not filtered_options:
             filtered_options = map_mandis.index.tolist()
 
-        # Retrieve default selection from session_state if available
         curr_inspected = st.session_state.get("inspected_mandi_id", filtered_options[0] if filtered_options else "")
         sel_idx = filtered_options.index(curr_inspected) if curr_inspected in filtered_options else 0
 
@@ -859,7 +857,6 @@ if st.session_state["experience_mode"] == "farmer":
             badge_color = "good" if is_green else ("mid" if is_blue else "bad")
             badge_title = "🟢 GREEN MARK: Top 3 Maximum Profit" if is_green else ("🔵 BLUE MARK: Top 4–10 High Return" if is_blue else "⚪ GREY MARK: Reachable Mandi")
 
-            # Calculate extra profit vs nearest local mandi
             nearest_net = float(decision_meta.get("nearest_net_price", row_ins["net_price_per_q"]))
             nearest_name = str(decision_meta.get("nearest_mandi", "Local Mandi")).split(" | ")[-1]
             extra_profit_total = float((row_ins["net_price_per_q"] - nearest_net) * farmer_qty)
@@ -949,8 +946,7 @@ if st.session_state["experience_mode"] == "farmer":
                 "total_net_realization": f"Total Net Payout ({farmer_qty:.0f}q)",
                 "risk_tier": "Price Volatility",
             })
-            
-            # Reset index and rename to prevent Unnamed: 0 from appearing
+
             comp_table = comp_display.reset_index().rename(columns={"index": "Mandi (State | Market)"})
             st.dataframe(comp_table.round(1), use_container_width=True, hide_index=True)
 
@@ -965,8 +961,8 @@ if st.session_state["experience_mode"] == "farmer":
         with watch_col1:
             st.markdown("#### Set a New Price Alert")
             target_mandi = st.selectbox("Select Mandi to Track", snap_df.index.tolist())
-            m_curr = float(snap_df.loc[target_mandi, "recent_price"])
-            target_rate = st.number_input(f"Target Price for {active_comm} (₹/quintal)", min_value=100.0, value=m_curr + 50.0, step=25.0)
+            m_curr = float(snap_df.loc[target_mandi, "recent_price"]) if (target_mandi and target_mandi in snap_df.index and "recent_price" in snap_df.columns) else 2400.0
+            target_rate = st.number_input(f"Target Price for {active_comm} (₹/quintal)", min_value=0.0, value=max(float(m_curr + 50.0), 0.0), step=25.0)
 
             if st.button("➕ Add to Watchlist & Set Alert", type="primary"):
                 st.session_state["watchlist"].add(target_mandi)
@@ -1004,7 +1000,7 @@ if st.session_state["experience_mode"] == "farmer":
         st.markdown(f"## 🏛️ Government MSP & Agricultural Market Services")
         st.caption("Verified official Minimum Support Price (MSP) benchmarks and agricultural market news.")
 
-        reg_price = float(snap_df["recent_price"].median())
+        reg_price = float(snap_df["recent_price"].median()) if ("recent_price" in snap_df.columns and not snap_df.empty and snap_df["recent_price"].notna().any()) else 2400.0
         msp_eval = compare_with_msp(active_comm, reg_price)
 
         if msp_eval["has_msp"]:
