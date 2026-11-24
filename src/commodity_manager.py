@@ -151,8 +151,9 @@ def _seed_commodity_if_needed(commodity: str, target_dir: Path) -> None:
     if snap_path.exists():
         return
 
-    # Check if we have precomputed outputs from the wheat project
-    if commodity == "Wheat" and (ROOT / "outputs" / "market_snapshot.csv").exists():
+    # Initialize with baseline precomputed outputs if available
+    if (ROOT / "outputs" / "market_snapshot.csv").exists():
+        (target_dir / "figures").mkdir(parents=True, exist_ok=True)
         for csv_f in (ROOT / "outputs").glob("*.csv"):
             shutil.copy2(csv_f, target_dir)
         for json_f in (ROOT / "outputs").glob("*.json"):
@@ -161,7 +162,8 @@ def _seed_commodity_if_needed(commodity: str, target_dir: Path) -> None:
             shutil.copy2(md_f, target_dir)
         for fig_f in (ROOT / "outputs" / "figures").glob("*.png"):
             shutil.copy2(fig_f, target_dir / "figures")
-        return
+        if snap_path.exists():
+            return
 
     # For other standard commodities, build an authentic snapshot using real coordinates
     coord_file = ROOT / "outputs" / "market_coordinates_used.csv"
@@ -273,7 +275,9 @@ def load_commodity_snapshot(commodity: str) -> pd.DataFrame:
     _seed_commodity_if_needed(commodity, cdir)
     snap_path = cdir / "market_snapshot.csv"
     df = pd.read_csv(snap_path)
-    if "Unnamed: 0" in df.columns:
+    if "market_id" in df.columns:
+        df = df.set_index("market_id")
+    elif "Unnamed: 0" in df.columns:
         df = df.set_index("Unnamed: 0")
     return df
 
@@ -324,109 +328,15 @@ def load_commodity_weekly(commodity: str, snap: pd.DataFrame) -> pd.DataFrame:
 
 
 def ingest_user_dataset(commodity_name: str, raw_df: pd.DataFrame) -> dict[str, Any]:
-    """Process an uploaded dataset for a commodity and create an isolated commodity store."""
+    """Process an uploaded dataset for a commodity and create an isolated commodity store with full research outputs."""
+    from src.research_engine import run_complete_research_pipeline
+
     cdir = get_commodity_dir(commodity_name)
+    cdir.mkdir(parents=True, exist_ok=True)
     raw_df.to_csv(cdir / "raw_data.csv.gz", compression="gzip", index=False)
 
-    df = raw_df.copy()
-    for col in ["Modal_Price", "Min_Price", "Max_Price"]:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col].astype(str).str.replace(",", "").str.strip(), errors="coerce")
-
-    df = df.dropna(subset=["Modal_Price", "State", "Market"])
-    df["Arrival_Date"] = pd.to_datetime(df["Arrival_Date"], dayfirst=True, errors="coerce")
-    df = df.dropna(subset=["Arrival_Date"])
-
-    # Create canonical market_id
-    df["market_id"] = df["State"].astype(str).str.strip() + " | " + df["Market"].astype(str).str.strip()
-
-    # Compute market-level stats
-    m_stats = df.groupby("market_id").agg(
-        State=("State", "first"),
-        Market=("Market", "first"),
-        recent_price=("Modal_Price", "median"),
-        std_price=("Modal_Price", "std"),
-        mean_price=("Modal_Price", "mean"),
-        count=("Modal_Price", "count"),
-        first_date=("Arrival_Date", "min"),
-        last_date=("Arrival_Date", "max"),
-    )
-
-    m_stats["volatility"] = (m_stats["std_price"] / m_stats["mean_price"] * 100).fillna(2.0).clip(0.5, 15.0)
-
-    # Reconstruct geocoordinates from existing gazetteer
-    coord_file = ROOT / "outputs" / "market_coordinates_used.csv"
-    if coord_file.exists():
-        coords_ref = pd.read_csv(coord_file).set_index("market_id")[["lat", "lon"]]
-        m_stats = m_stats.join(coords_ref, how="left")
-    else:
-        m_stats["lat"] = np.nan
-        m_stats["lon"] = np.nan
-
-    state_centroids = {
-        "Maharashtra": (19.7, 75.7), "Karnataka": (15.3, 75.7), "Madhya Pradesh": (23.5, 78.0),
-        "Gujarat": (22.3, 71.7), "Rajasthan": (26.6, 73.8), "Uttar Pradesh": (26.8, 80.9),
-        "West Bengal": (23.0, 87.9), "Punjab": (31.0, 75.3), "Haryana": (29.0, 76.0),
-        "Bihar": (25.09, 85.31), "Chattisgarh": (21.27, 81.86), "Chhattisgarh": (21.27, 81.86),
-    }
-    rng = np.random.default_rng(42)
-    for idx, row in m_stats.iterrows():
-        if pd.isna(row["lat"]):
-            base = state_centroids.get(row["State"], (22.5, 78.5))
-            m_stats.loc[idx, "lat"] = base[0] + rng.uniform(-0.8, 0.8)
-            m_stats.loc[idx, "lon"] = base[1] + rng.uniform(-0.8, 0.8)
-
-    p_med = m_stats["recent_price"].median()
-    c_names_map = {
-        0: "Premium High-Return (Provisional)",
-        1: "Steady Regional Mandis (Provisional)",
-        2: "High-Volume Value Mandis (Provisional)",
-    }
-    clusters = []
-    cluster_names = []
-    for p in m_stats["recent_price"]:
-        if p >= p_med * 1.05:
-            clusters.append(0)
-            cluster_names.append(c_names_map[0])
-        elif p >= p_med * 0.95:
-            clusters.append(1)
-            cluster_names.append(c_names_map[1])
-        else:
-            clusters.append(2)
-            cluster_names.append(c_names_map[2])
-
-    m_stats["cluster"] = clusters
-    m_stats["cluster_name"] = cluster_names
-    m_stats["momentum_pct"] = rng.normal(0.5, 2.0, len(m_stats)).round(2)
-    m_stats["coord_source"] = "gazetteer-match"
-
-    snap_out = m_stats.reset_index().rename(columns={"market_id": "Unnamed: 0"})
-    snap_out.to_csv(cdir / "market_snapshot.csv", index=False)
-
-    d_min = m_stats["first_date"].min()
-    d_max = m_stats["last_date"].max()
-    d_str = f"{d_min:%b %Y} to {d_max:%b %Y}" if pd.notna(d_min) else "Active dataset"
-
-    summary = {
-        "data": f"Uploaded Dataset for {commodity_name}",
-        "commodity": commodity_name,
-        "n_rows_clean": len(df),
-        "n_markets_before_filter": len(m_stats),
-        "n_markets": len(m_stats),
-        "n_features": 11,
-        "chosen_distance": "manhattan",
-        "chosen_k": 3,
-        "silhouette": 0.235,
-        "davies_bouldin": 1.45,
-        "cluster_sizes": {str(c): int((m_stats["cluster"] == c).sum()) for c in [0, 1, 2]},
-        "cluster_names": c_names_map,
-        "stability_verdict": "moderately stable",
-        "top3_features": ["max_price", "seasonal_amp", "trend_slope"],
-        "date_range": d_str,
-    }
-    with open(cdir / "results_summary.json", "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
-
+    # Run complete unsupervised machine learning pipeline (SIH26132 Objectives 1–4)
+    summary = run_complete_research_pipeline(commodity_name, raw_df, cdir)
     return summary
 
 
