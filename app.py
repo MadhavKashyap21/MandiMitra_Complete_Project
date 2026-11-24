@@ -533,20 +533,31 @@ def page_trends():
     c_m4.metric("🟠 Volatile (अस्थिर)", counts.get("Highly Volatile (अस्थिर)", 0))
 
     st.markdown("### Interactive Price Movement Explorer")
-    chart_df = moved_df.reset_index().rename(columns={"index": "mandi", "Unnamed: 0": "mandi"})
-    m_chart = (
-        alt.Chart(chart_df)
-        .mark_circle(size=80, opacity=0.8)
-        .encode(
-            x=alt.X("recent_price:Q", title=f"{active_comm} Recent Price (₹/quintal)"),
-            y=alt.Y("momentum_pct:Q", title="Price Momentum (% vs 4 weeks prior)"),
-            color=alt.Color("movement_tag:N", scale=alt.Scale(scheme="category10"), legend=alt.Legend(title="Market Movement")),
-            tooltip=["mandi:N", "State:N", "recent_price:Q", "momentum_pct:Q", "volatility:Q", "movement_tag:N"],
+    chart_df = moved_df.copy()
+    chart_df["mandi"] = chart_df.index.astype(str)
+    try:
+        m_chart = (
+            alt.Chart(chart_df)
+            .mark_circle(size=80, opacity=0.8)
+            .encode(
+                x=alt.X("recent_price:Q", title=f"{active_comm} Recent Price (₹/quintal)"),
+                y=alt.Y("momentum_pct:Q", title="Price Momentum (% vs 4 weeks prior)"),
+                color=alt.Color("movement_tag:N", scale=alt.Scale(scheme="category10"), legend=alt.Legend(title="Market Movement")),
+                tooltip=[
+                    alt.Tooltip("mandi:N", title="Mandi"),
+                    alt.Tooltip("State:N", title="State"),
+                    alt.Tooltip("recent_price:Q", title="Price (₹/q)"),
+                    alt.Tooltip("momentum_pct:Q", title="Momentum (%)"),
+                    alt.Tooltip("volatility:Q", title="Volatility (%)"),
+                    alt.Tooltip("movement_tag:N", title="Movement"),
+                ],
+            )
+            .properties(height=380, width="container")
+            .interactive()
         )
-        .properties(height=380, width="container")
-        .interactive()
-    )
-    st.altair_chart(m_chart, use_container_width=True)
+        st.altair_chart(m_chart, use_container_width=True)
+    except Exception:
+        pass
 
     st.markdown("### Market Movement Detail Table")
     st.dataframe(
@@ -1205,23 +1216,29 @@ def page_research_overview():
         c1.image(str(f1), caption="State-wise Market Counts (Fig 01)")
     else:
         st_counts = comm_df.groupby("State")["Market"].nunique().reset_index().rename(columns={"Market": "Mandi_Count"}).sort_values("Mandi_Count", ascending=False).head(15)
-        ch1 = alt.Chart(st_counts).mark_bar(color="#52B788", cornerRadiusEnd=4).encode(
-            x=alt.X("Mandi_Count:Q", title="Reporting Mandis"),
-            y=alt.Y("State:N", sort="-x", title="State / UT"),
-            tooltip=["State:N", "Mandi_Count:Q"]
-        ).properties(height=300, width="container").interactive()
-        c1.altair_chart(ch1, use_container_width=True)
+        try:
+            ch1 = alt.Chart(st_counts).mark_bar(color="#52B788", cornerRadiusEnd=4).encode(
+                x=alt.X("Mandi_Count:Q", title="Reporting Mandis"),
+                y=alt.Y("State:N", sort="-x", title="State / UT"),
+                tooltip=[alt.Tooltip("State:N", title="State"), alt.Tooltip("Mandi_Count:Q", title="Mandis")]
+            ).properties(height=300, width="container").interactive()
+            c1.altair_chart(ch1, use_container_width=True)
+        except Exception:
+            c1.dataframe(st_counts, use_container_width=True)
 
     if f2.exists():
         c2.image(str(f2), caption="Modal Price Distribution (Fig 02)")
     else:
         sample_df = comm_df.sample(min(len(comm_df), 5000), random_state=42) if len(comm_df) > 5000 else comm_df
-        ch2 = alt.Chart(sample_df).mark_bar(color="#4A90E2", opacity=0.8).encode(
-            x=alt.X("Modal_Price:Q", bin=alt.Bin(maxbins=35), title=f"{active_comm} Modal Price (₹/quintal)"),
-            y=alt.Y("count():Q", title="Daily Trading Records"),
-            tooltip=["count():Q"]
-        ).properties(height=300, width="container").interactive()
-        c2.altair_chart(ch2, use_container_width=True)
+        try:
+            ch2 = alt.Chart(sample_df).mark_bar(color="#4A90E2", opacity=0.8).encode(
+                x=alt.X("Modal_Price:Q", bin=alt.Bin(maxbins=35), title=f"{active_comm} Modal Price (₹/quintal)"),
+                y=alt.Y("count():Q", title="Daily Trading Records"),
+                tooltip=[alt.Tooltip("count():Q", title="Records")]
+            ).properties(height=300, width="container").interactive()
+            c2.altair_chart(ch2, use_container_width=True)
+        except Exception:
+            pass
 
     f3 = fig_dir / "03_reports_per_month.png"
     if f3.exists():
@@ -1230,12 +1247,15 @@ def page_research_overview():
         m_df = comm_df.copy()
         m_df["YearMonth"] = pd.to_datetime(m_df["Arrival_Date"], errors="coerce").dt.to_period("M").astype(str)
         ym_counts = m_df.groupby("YearMonth").size().reset_index(name="Reports")
-        ch3 = alt.Chart(ym_counts).mark_line(point=True, color="#1E5128").encode(
-            x=alt.X("YearMonth:N", title="Reporting Month"),
-            y=alt.Y("Reports:Q", title="Daily Trading Reports"),
-            tooltip=["YearMonth:N", "Reports:Q"]
-        ).properties(height=260, width="container").interactive()
-        st.altair_chart(ch3, use_container_width=True)
+        try:
+            ch3 = alt.Chart(ym_counts).mark_line(point=True, color="#1E5128").encode(
+                x=alt.X("YearMonth:N", title="Reporting Month"),
+                y=alt.Y("Reports:Q", title="Daily Trading Reports"),
+                tooltip=[alt.Tooltip("YearMonth:N", title="Month"), alt.Tooltip("Reports:Q", title="Reports")]
+            ).properties(height=260, width="container").interactive()
+            st.altair_chart(ch3, use_container_width=True)
+        except Exception:
+            st.dataframe(ym_counts, use_container_width=True)
 
     rel_file = cdir / "variable_relevance.csv"
     if rel_file.exists():
@@ -1364,15 +1384,35 @@ def page_research_clustering():
         st.image(str(f16), caption="Cluster Separation in 2D PCA Space (Fig 16)")
 
     st.markdown("#### Interactive 2D Market Cluster Projection")
-    chart_data = snap_df.reset_index()
-    id_col = "market_id" if "market_id" in chart_data.columns else chart_data.columns[0]
-    pca_scatter = alt.Chart(chart_data).mark_circle(size=80, opacity=0.8).encode(
-        x=alt.X("recent_price:Q", title=f"{active_comm} Recent Price (₹/quintal)"),
-        y=alt.Y("volatility:Q", title="Price Volatility (CV %)"),
-        color=alt.Color("cluster_name:N", scale=alt.Scale(scheme="category10"), legend=alt.Legend(title="Assigned Cluster")),
-        tooltip=[f"{id_col}:N", "State:N", "recent_price:Q", "volatility:Q", "cluster_name:N"]
-    ).properties(height=360, width="container").interactive()
-    st.altair_chart(pca_scatter, use_container_width=True)
+    chart_data = snap_df.copy()
+    chart_data["Mandi_Name"] = chart_data.index.astype(str)
+    chart_data["recent_price"] = pd.to_numeric(chart_data.get("recent_price", 0), errors="coerce").fillna(0.0)
+    chart_data["volatility"] = pd.to_numeric(chart_data.get("volatility", 0), errors="coerce").fillna(0.0)
+    chart_data["State"] = chart_data.get("State", "Unknown").astype(str)
+    chart_data["cluster_name"] = chart_data.get("cluster_name", "Cluster").astype(str)
+
+    try:
+        pca_scatter = (
+            alt.Chart(chart_data)
+            .mark_circle(size=80, opacity=0.8)
+            .encode(
+                x=alt.X("recent_price:Q", title=f"{active_comm} Recent Price (₹/quintal)"),
+                y=alt.Y("volatility:Q", title="Price Volatility (CV %)"),
+                color=alt.Color("cluster_name:N", scale=alt.Scale(scheme="category10"), legend=alt.Legend(title="Assigned Cluster")),
+                tooltip=[
+                    alt.Tooltip("Mandi_Name:N", title="Mandi"),
+                    alt.Tooltip("State:N", title="State"),
+                    alt.Tooltip("recent_price:Q", title="Recent Price (₹/q)", format=",.1f"),
+                    alt.Tooltip("volatility:Q", title="Volatility (%)", format=".1f"),
+                    alt.Tooltip("cluster_name:N", title="Cluster"),
+                ],
+            )
+            .properties(height=360, width="container")
+            .interactive()
+        )
+        st.altair_chart(pca_scatter, use_container_width=True)
+    except Exception:
+        st.dataframe(chart_data[["Mandi_Name", "State", "recent_price", "volatility", "cluster_name"]].head(25), use_container_width=True)
 
     st.markdown("### Hierarchical Clustering (Ward Linkage)")
     f17, f18 = fig_dir / "17_dendrogram.png", fig_dir / "18_ward_crosstab.png"
@@ -1434,12 +1474,19 @@ def page_research_profiles():
         fc_df = pd.read_csv(fc_file)
         st.markdown("#### Feature Contribution Metrics Table")
         st.dataframe(fc_df.round(3), use_container_width=True)
-        ch_eta = alt.Chart(fc_df.head(10)).mark_bar(color="#2D6A4F", cornerRadiusEnd=4).encode(
-            x=alt.X("eta_squared:Q", title="ANOVA Eta-Squared (η²)"),
-            y=alt.Y("feature:N", sort="-x", title="Distinguishing Feature"),
-            tooltip=["feature:N", "eta_squared:Q", "anova_F:Q"]
-        ).properties(height=280, width="container").interactive()
-        st.altair_chart(ch_eta, use_container_width=True)
+        if "eta_squared" in fc_df.columns and "feature" in fc_df.columns:
+            try:
+                ch_eta = alt.Chart(fc_df.head(10)).mark_bar(color="#2D6A4F", cornerRadiusEnd=4).encode(
+                    x=alt.X("eta_squared:Q", title="ANOVA Eta-Squared (η²)"),
+                    y=alt.Y("feature:N", sort="-x", title="Distinguishing Feature"),
+                    tooltip=[
+                        alt.Tooltip("feature:N", title="Feature"),
+                        alt.Tooltip("eta_squared:Q", title="Eta-Squared (η²)", format=".3f"),
+                    ]
+                ).properties(height=280, width="container").interactive()
+                st.altair_chart(ch_eta, use_container_width=True)
+            except Exception:
+                pass
 
     st.markdown("### Quantitative Stability & Sensitivity Validation (Objective 3)")
     f25, f26 = fig_dir / "25_stability_components.png", fig_dir / "26_stability.png"
@@ -1461,14 +1508,23 @@ def page_research_profiles():
 
     if not ranked_mandis.empty:
         st.markdown("#### Top 10 Transport-Adjusted Net Realization Mandis")
-        top10 = ranked_mandis.head(10).reset_index().rename(columns={"index": "mandi", "Unnamed: 0": "mandi"})
-        ch_top10 = alt.Chart(top10).mark_bar(color="#52B788", cornerRadiusEnd=4).encode(
-            x=alt.X("net_price:Q", title="Net Selling Price (₹/quintal)"),
-            y=alt.Y("mandi:N", sort="-x", title="Top Mandi"),
-            color=alt.Color("cluster_name:N", legend=alt.Legend(title="Cluster")),
-            tooltip=["mandi:N", "net_price:Q", "road_km:Q", "cluster_name:N"]
-        ).properties(height=320, width="container").interactive()
-        st.altair_chart(ch_top10, use_container_width=True)
+        top10 = ranked_mandis.head(10).copy()
+        top10["mandi"] = top10.index.astype(str)
+        try:
+            ch_top10 = alt.Chart(top10).mark_bar(color="#52B788", cornerRadiusEnd=4).encode(
+                x=alt.X("net_price:Q", title="Net Selling Price (₹/quintal)"),
+                y=alt.Y("mandi:N", sort="-x", title="Top Mandi"),
+                color=alt.Color("cluster_name:N", legend=alt.Legend(title="Cluster")),
+                tooltip=[
+                    alt.Tooltip("mandi:N", title="Mandi"),
+                    alt.Tooltip("net_price:Q", title="Net Price (₹/q)", format=",.1f"),
+                    alt.Tooltip("road_km:Q", title="Distance (km)", format=".0f"),
+                    alt.Tooltip("cluster_name:N", title="Cluster"),
+                ]
+            ).properties(height=320, width="container").interactive()
+            st.altair_chart(ch_top10, use_container_width=True)
+        except Exception:
+            st.dataframe(top10[["mandi", "net_price", "road_km", "cluster_name"]], use_container_width=True)
 
     st.markdown(
         "Formal definition: $Net\\,Price = Listed\\,Price \\times (1 - fee) - rate \\times road\\_km$.<br>"
